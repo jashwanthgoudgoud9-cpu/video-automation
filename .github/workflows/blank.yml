@@ -11,15 +11,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install System Tools
+      - name: Install FFmpeg
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-
-      - name: Install Python Libraries
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install moviepy imageio imageio-ffmpeg
 
       - name: Run Script
         run: |
