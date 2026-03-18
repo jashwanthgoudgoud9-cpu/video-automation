@@ -13,14 +13,15 @@ jobs:
 
       - name: Install System Tools
         run: |
-          sudo apt update
-          sudo apt install -y ffmpeg
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
       - name: Install Python Libraries
         run: |
-          pip install moviepy edge-tts faster-whisper
+          python3 -m pip install --upgrade pip
+          pip install moviepy imageio imageio-ffmpeg
 
-      - name: Run Automation Script
+      - name: Run Script
         run: |
           python3 main.py
 
