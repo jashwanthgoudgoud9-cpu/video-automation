@@ -1,9 +1,11 @@
 import os
-print("🚀 Automation Started")
+from moviepy.editor import TextClip, CompositeVideoClip
 
 os.makedirs("output", exist_ok=True)
 
-with open("output/result.txt", "w") as f:
-    f.write("Automation is working!")
+# Create simple video
+clip = TextClip("Your Automation Working 🚀", fontsize=70, size=(1280,720))
+clip = clip.set_duration(5)
 
-print("✅ Done")
+video = CompositeVideoClip([clip])
+video.write_videofile("output/video.mp4", fps=24)
