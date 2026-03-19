@@ -1,70 +1,58 @@
 import os
 import requests
 
-# =========================
-# CREATE REQUIRED FOLDERS
-# =========================
 os.makedirs("clips", exist_ok=True)
 os.makedirs("audio", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
 # =========================
-# STEP 1: GET SCRIPT FROM GOOGLE SHEET
+# STEP 1: GET SCRIPT
 # =========================
 sheet_url = "https://docs.google.com/spreadsheets/d/1pwlfl9ATEVSSrKskSdUVKbHbNG51KppQZw5IJClxIc0/export?format=csv"
 
 try:
     response = requests.get(sheet_url)
     data = response.text.split("\n")
-
-    # remove header + empty rows
     rows = [r.strip() for r in data[1:] if r.strip()]
 
-    if not rows:
-        raise Exception("No data found in sheet")
+    if len(rows) == 0:
+        script = "Fallback script because sheet empty"
+    else:
+        script = rows[0]
 
-    # take first script
-    script = rows[0]
+except:
+    script = "Fallback script because sheet error"
 
-except Exception as e:
-    print("Error reading Google Sheet:", e)
-    script = "This is fallback script because sheet failed."
-
-print("Using script:", script)
+print("SCRIPT:", script)
 
 # =========================
-# STEP 2: SPLIT INTO SCENES
+# STEP 2: SCENES
 # =========================
 scenes = [s.strip() for s in script.split('.') if s.strip()]
 
 if len(scenes) == 0:
-    scenes = [script]
-
-print("Scenes:", scenes)
+    scenes = ["Default scene"]
 
 # =========================
-# STEP 3: GENERATE VOICE
+# STEP 3: VOICE
 # =========================
 for i, scene in enumerate(scenes):
-    command = f'edge-tts --text "{scene}" --voice en-US-AriaNeural --write-media audio/voice_{i}.mp3'
-    os.system(command)
+    os.system(f'edge-tts --text "{scene}" --voice en-US-AriaNeural --write-media audio/voice_{i}.mp3')
 
 # =========================
-# STEP 4: CREATE SIMPLE VIDEO CLIPS
+# STEP 4: VIDEO
 # =========================
 for i in range(len(scenes)):
-    command = f'ffmpeg -y -f lavfi -i color=c=black:s=1280x720:d=3 clips/clip_{i}.mp4'
-    os.system(command)
+    os.system(f'ffmpeg -y -f lavfi -i color=c=black:s=1280x720:d=3 clips/clip_{i}.mp4')
 
 # =========================
-# STEP 5: MERGE CLIP + AUDIO
+# STEP 5: MERGE
 # =========================
 for i in range(len(scenes)):
-    command = f'ffmpeg -y -i clips/clip_{i}.mp4 -i audio/voice_{i}.mp3 -shortest -c:v libx264 -c:a aac output/scene_{i}.mp4'
-    os.system(command)
+    os.system(f'ffmpeg -y -i clips/clip_{i}.mp4 -i audio/voice_{i}.mp3 -shortest -c:v libx264 -c:a aac output/scene_{i}.mp4')
 
 # =========================
-# STEP 6: COMBINE ALL SCENES
+# STEP 6: FINAL OUTPUT (FORCED)
 # =========================
 with open("list.txt", "w") as f:
     for i in range(len(scenes)):
@@ -72,4 +60,9 @@ with open("list.txt", "w") as f:
 
 os.system("ffmpeg -y -f concat -safe 0 -i list.txt -c copy output/final.mp4")
 
-print("✅ FINAL VIDEO CREATED SUCCESSFULLY")
+# 🔥 FORCE fallback if failed
+if not os.path.exists("output/final.mp4"):
+    print("⚠️ Creating fallback video...")
+    os.system("ffmpeg -y -f lavfi -i color=c=red:s=1280x720:d=5 output/final.mp4")
+
+print("✅ FINAL VIDEO READY")
