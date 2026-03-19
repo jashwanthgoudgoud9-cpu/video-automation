@@ -8,24 +8,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install System Tools
+      - name: Install FFmpeg
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Install Python Libraries
+      - name: Install Python
         run: |
           python3 -m pip install --upgrade pip
           pip install requests
 
-      - name: Run Main Script
+      - name: Run Script
         run: |
           python3 main.py
 
-      - name: Upload Output Files
+      - name: Upload Output
         uses: actions/upload-artifact@v4
         with:
           name: output-files
