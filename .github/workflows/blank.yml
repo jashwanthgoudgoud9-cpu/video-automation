@@ -8,13 +8,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install FFmpeg
+      - name: Install Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
+          pip install edge-tts
 
       - name: Run Script
         run: |
