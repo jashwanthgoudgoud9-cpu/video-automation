@@ -1,12 +1,26 @@
+import requests
 import os
 
-# create folders
-os.makedirs("clips", exist_ok=True)
-os.makedirs("audio", exist_ok=True)
-os.makedirs("output", exist_ok=True)
+sheet_url = "https://docs.google.com/spreadsheets/d/1pwlfl9ATEVSSrKskSdUVKbHbNG51KppQZw5IJClxIc0/export?format=csv"
 
-# STEP 1: Script
-script = "This is my first cloud automation video. This system is working perfectly."
+data = requests.get(sheet_url).text.split("\n")
+rows = [r.strip() for r in data[1:] if r.strip()]
+
+# track which script used
+if os.path.exists("index.txt"):
+    with open("index.txt", "r") as f:
+        index = int(f.read().strip())
+else:
+    index = 0
+
+# get script
+script = rows[index]
+
+# update index
+with open("index.txt", "w") as f:
+    f.write(str((index + 1) % len(rows)))
+
+print("Using script:", script)
 
 # STEP 2: Scene split
 scenes = [s.strip() for s in script.split('.') if s.strip()]
