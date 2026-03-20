@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Install FFmpeg
@@ -16,16 +16,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Install Python
+      - name: Install Python Libraries
         run: |
           python3 -m pip install --upgrade pip
-          pip install requests
+          pip install requests gTTS
 
-      - name: Run Script
+      - name: Run Main Script
         run: |
           python3 main.py
 
-      - name: Upload Output
+      - name: Show Output Files
+        run: |
+          ls -lh output || true
+
+      - name: Upload Output Files
         uses: actions/upload-artifact@v4
         with:
           name: output-files
